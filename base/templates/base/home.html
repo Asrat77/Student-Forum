@@ -28,7 +28,7 @@
     <div>
         <a href="{% url 'create-room' %}">Create Room</a>
         <div>
-            {% for rooms in rooms %}
+            {% for room in rooms %}
             <div>
                 <a href="{% url 'update-room' room.id %}">Edit</a>
                 <a href="{% url 'delete-room' room.id %}">Delete</a>
