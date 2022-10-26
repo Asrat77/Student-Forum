@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
+from .models import Room,Topic,Message
 # Create your views here.
 
 '''
@@ -54,7 +55,7 @@ def registerPage(request):
    if request.method == 'POST':
       form = UserCreationForm(request.POST)
       if form.is_valid():
-         user = form .save(commit=False)
+         user = form.save(commit=False)
          user.username = user.username.lower()
          user.save()
          login(request, user)
@@ -66,7 +67,16 @@ def registerPage(request):
 def room(request, pk):
    
    room = Room.objects.get(id=pk)
-   context = {'room': room}
+   room_messages = room.message_set.all().order_by('-created') # returns all messages related to the specific room.
+   if request.method == 'POST':
+      message = Message.objects.create(
+         user=request.user,
+         room=room,
+         body=request.POST.get('body')
+      )
+      return redirect('room', pk=room.id) # returned room to refresh the page so it can minimize any errors since its a post request
+      
+   context = {'room': room, 'room_messages': room_messages}
    
    return  render(request, 'base/room.html', context)
 
