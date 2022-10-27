@@ -10,20 +10,19 @@
 
 <div class="room-conatiner">
     <div>
-
     <h1> {{room.name}} </h1>
-
     <p>{{room.description}}</p>
-        #
     <div class="comment-wrapper">
         <h3>Conversation</h3>
         <hr>
         {% for message in room_messages %}
             <div>
+                {% if request.user == message.user %} 
+                <a href="{% url 'delete-message' message.id %}">Delete</a>
+                {% endif %}        
                 <small>@{{message.user}} {{message.created|timesince}} ago </small>
                 <hr>
                 <p>{{message.body}}</p>
-        
             </div>
         {% endfor %}
     </div>
@@ -32,7 +31,6 @@
         <form method="POST" action="">
             {% csrf_token %}
             <input type="text" name="body" placeholder="Write your message here...">
-
         </form>
     </div>
     {% endif %}
@@ -40,8 +38,11 @@
     <div>
         <h3>Participants</h3>
         <hr>
-
-        
+        {% for participant in participants %}
+            <div>
+                <p>@{{participant.username}}</p>
+            </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock content %}̀
