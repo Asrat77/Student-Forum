@@ -1,14 +1,10 @@
 {% extends 'main.html' %}
 
 {% block content %}
-<style>
-    .room-container{
-        display: grid;
-        grid-template-columns: 3fr 1fr;
-    }
-</style>
 
-<div class="room-conatiner">
+
+<div style="display: flex;" class="room-conatiner">
+    <div>
     <div>
     <h1> {{room.name}} </h1>
     <p>{{room.description}}</p>
@@ -35,7 +31,8 @@
     </div>
     {% endif %}
     </div>
-    <div>
+    </div>
+    <div style="margin-left: 30px">
         <h3>Participants</h3>
         <hr>
         {% for participant in participants %}
