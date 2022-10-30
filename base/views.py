@@ -1,4 +1,6 @@
+
 from multiprocessing import context
+import re
 from urllib import request
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
@@ -10,6 +12,8 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
+from .models import Room,Topic,Message
+from .models import Message
 # Create your views here.
 
 '''
@@ -54,7 +58,7 @@ def registerPage(request):
    if request.method == 'POST':
       form = UserCreationForm(request.POST)
       if form.is_valid():
-         user = form .save(commit=False)
+         user = form.save(commit=False)
          user.username = user.username.lower()
          user.save()
          login(request, user)
@@ -66,7 +70,18 @@ def registerPage(request):
 def room(request, pk):
    
    room = Room.objects.get(id=pk)
-   context = {'room': room}
+   room_messages = room.message_set.all().order_by('-created') # returns all messages related to the specific room.
+   participants = room.participants.all()
+   if request.method == 'POST':
+      message = Message.objects.create(
+         user=request.user,
+         room=room,
+         body=request.POST.get('body')
+      )
+      room.participants.add(request.user) # adds a user to participant list after they comment.
+      return redirect('room', pk=room.id) # returned room to refresh the page so it can minimize any errors since its a post request.
+      
+   context = {'room': room, 'room_messages': room_messages, 'participants': participants}
    
    return  render(request, 'base/room.html', context)
 
@@ -127,3 +142,13 @@ def deleteRoom(request, pk):
    return render(request,'base/delete.html', {'obj':room})
 
 
+@login_required(login_url='/login')
+def deleteMessage(request, pk):
+   message = Message.objects.get(id=pk)
+
+   if request.user != message.user:
+      return HttpResponse('You are not allowed here!!!')
+   if request.method == 'POST':
+      message.delete()
+      return redirect('home')
+   return render(request, 'base/delete.html', {'obj': message})
