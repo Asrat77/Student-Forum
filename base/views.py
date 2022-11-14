@@ -1,7 +1,3 @@
-
-from multiprocessing import context
-import re
-from urllib import request
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from base.models import Room, Topic
