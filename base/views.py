@@ -120,12 +120,19 @@ def userProfile(request, pk):
 @login_required(login_url='/login')
 def createRoom(request):
     form = RoomForm()
+    topics = Topic.objects.all()
 
-    context = {'form': form}
+    context = {'form': form, 'topics':topics}
     if request.method == 'POST':
-        form = RoomForm(request.POST)
-        if form.is_valid():
-            form.save()
+        topic_name = request.POST.get('topic')
+        topic, created = Topic.objects.get_or_create(name=topic_name)
+        
+        Room.objects.create(
+            host = request.user,
+            topic = topic,
+            name = request.POST.get('name'),
+            description= request.POST.get('description'),
+        )
         return redirect('home')
     return render(request, 'base/room_form.html', context)
 
@@ -134,14 +141,18 @@ def createRoom(request):
 def updateRoom(request, pk):
     room = Room.objects.get(id=pk)
     form = RoomForm(instance=room)
-    context = {'form': form}
+    topics = Topic.objects.all()
+    context = {'form': form, 'topics':topics, 'room':room}
     if request.user != room.host:
         return HttpResponse('You are not allowed here!!!')
     if request.method == 'POST':
-        form = RoomForm(request.POST, instance=room)
+        topic_name = request.POST.get('topic')
+        topic, created = Topic.objects.get_or_create(name=topic_name)
 
-        if form.is_valid():
-            form.save()
+        room.name = request.POST.get('name')
+        room.topic = topic
+        room.description = request.POST.get('description')
+        room.save()
         return redirect('home')
     return render(request, 'base/room_form.html', context)
 
