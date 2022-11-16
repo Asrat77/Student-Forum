@@ -8,6 +8,7 @@
   --color-dark-light: #727378;
   --color-light: #e5e5e5;
   --color-gray: #8b8b8b;
+  --color-bg:#515151;
   --color-light-gray: #b2bdbd;
   --color-success: #5dd693;
   --color-error: #fc4b0b;
@@ -47,7 +48,6 @@ body {
   font-weight: 400;
   font-size: 1.5rem;
   color: var(--color-light-gray);
-  background:url(./assets/bg.jpg);
   min-height: 100vh;
 }
 
